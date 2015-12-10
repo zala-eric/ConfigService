@@ -1,0 +1,46 @@
+import org.gradle.plugins.ide.eclipse.model.Facet
+ 
+apply plugin: 'java'
+apply plugin: 'war'
+apply plugin: 'eclipse-wtp'
+ 
+sourceCompatibility = 1.8   // 设置 JDK 版本
+webAppDirName = 'WebContent'    // 设置 WebApp 根目录
+sourceSets.main.java.srcDir 'src/main/java'   // 设置 Java 源码所在目录
+ext{
+	   fmversion = "1.1.0"
+} 
+repositories {
+  maven {
+        url "http://202.105.139.120:8081/artifactory/repo"
+    }
+  mavenCentral()
+}
+ 
+// 设置依赖
+dependencies {
+    compile ("com.tydic.fm:fm-domain:${fmversion}")
+    compile 'javax.servlet:javax.servlet-api:3.1.0'
+    compile 'org.mybatis:mybatis-spring:1.2.2'
+    compile 'org.mybatis:mybatis:3.2.8'
+    compile 'com.oracle:ojdbc14:10.2.0.4.0'
+    compile 'mysql:mysql-connector-java:5.1.35'
+    compile 'com.alibaba:druid:1.0.9'
+    compile 'org.springframework:spring-jdbc:4.1.1.RELEASE'
+    compile 'org.springframework:spring-web:4.1.1.RELEASE'
+    compile 'com.alibaba:fastjson:1.2.1'
+}
+ 
+// 设置 Project Facets
+eclipse {
+    wtp {
+        facet {
+            facet name: 'jst.web', type: Facet.FacetType.fixed
+            facet name: 'wst.jsdt.web', type: Facet.FacetType.fixed
+            facet name: 'jst.java', type: Facet.FacetType.fixed
+            facet name: 'jst.web', version: '3.0'
+            facet name: 'jst.java', version: '1.8'
+            facet name: 'wst.jsdt.web', version: '1.0'
+        }
+    }
+}

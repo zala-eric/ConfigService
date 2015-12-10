@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/xml/doc-files/log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+	<!-- 控制台输出日志文件 -->
+	<appender name="stdout" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[fm-log4j] %-5p %d{HH:mm:ss} %l%n%m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="ALL" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	<!-- 固定文件输出日志 -->
+	<appender name="fileout" class="org.apache.log4j.FileAppender">
+		<param name="File" value="logs/filelog.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d - %c -%-4r [%t] %-5p %x - %m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="ALL" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	<!-- 输出日志到文件,文件大小到达指定尺寸的时候产生一个新的文件 -->
+	<appender name="rollfileout" class="org.apache.log4j.RollingFileAppender">
+		<param name="file" value="logs/rollingFile.log" />
+		<param name="Append" value="true" />
+		<param name="MaxFileSize" value="100MB" />
+		<param name="MaxBackupIndex" value="10" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[fm-log4j] %-5p %d{HH:mm:ss} %l%n%m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="ALL" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	<!-- 按时间段产生文件 -->
+	<appender name="dailyRollingFile" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="Threshold" value="debug"></param>
+		<param name="ImmediateFlush" value="true"></param>
+		<param name="File" value="logs/dailyRollingFile.log"></param>
+		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[fm-log4j] %-5p %d{HH:mm:ss} %l%n%m%n" />
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="ALL" />
+			<param name="AcceptOnMatch" value="true" />
+		</filter>
+	</appender>
+	<!-- log4j自带的日志入库 -->
+	<appender name="database" class="org.apache.log4j.jdbc.JDBCAppender">
+		<param name="URL" value="jdbc:mysql://115.28.225.83:3306/vk_sz1_01" />
+		<param name="driver" value="com.mysql.jdbc.Driver" />
+		<param name="user" value="root" />
+		<param name="password" value="root" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="insert into sys_test(name,msg)values('%d', '%m')" />
+		</layout>
+	</appender>
+
+	<!-- <logger name="com.tydic.test" additivity="false"> <level value="ALL"></level> 
+		<appender-ref ref="dailyRollingFile" /> </logger> -->
+	<root>
+		<priority value="ALL" />
+		<appender-ref ref="stdout" />
+		<appender-ref ref="rollfileout" />
+	</root>
+</log4j:configuration>

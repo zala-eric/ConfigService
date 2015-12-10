@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tydic.fm.config.dao.SysConfigFile">
+	<select id="selectConfigFile" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+			SELECT
+				m.CONFIG_ID,
+				m.CONFIG_KEY,
+				m.CONFIG_NAME,
+				m.CONFIG_VALUE,
+				m.APP_NODE
+			FROM
+				(
+					SELECT
+						t.CONFIG_ID,
+						t.CONFIG_KEY,
+						t.CONFIG_NAME,
+						t.CONFIG_VALUE,
+						t.APP_NODE,
+			
+					IF (
+						t.app_node = 'comm_config' ,- 1,
+						1
+					) AS order_priorty
+					FROM
+						sys_config_file t
+					WHERE
+						(
+							t.app_node = #{appNode}
+							OR t.app_node = 'comm_config'
+						)
+					AND t.eff_state = 1
+				) m
+			ORDER BY
+				m.order_priorty ASC
+		]]>
+	</select>
+	<select id="selectBusenessFile" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+			SELECT
+				m.CONFIG_ID,
+				m.CONFIG_KEY,
+				m.CONFIG_NAME,
+				m.CONFIG_VALUE,
+				m.APP_NODE
+			FROM
+				(
+					SELECT
+						t.CONFIG_ID,
+						t.CONFIG_KEY,
+						t.CONFIG_NAME,
+						t.CONFIG_VALUE,
+						t.APP_NODE,
+			
+					IF (
+						t.app_node = 'comm_config' ,- 1,
+						1
+					) AS order_priorty
+					FROM
+						sys_business_file t
+					WHERE
+						(
+							t.app_node = #{appNode}
+							OR t.app_node = 'comm_config'
+						)
+					AND t.eff_state = 1
+				) m
+			ORDER BY
+				m.order_priorty ASC
+		]]>
+	</select>
+	<select id="selectRouteKey" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+		SELECT
+			t.CONFIG_ID,
+			t.CONFIG_GROUP,
+			t.CONFIG_KEY,
+			t.CONFIG_NAME,
+			t.CONFIG_VALUE,
+			t.APP_NODE,
+			t.TABLE_KEY
+		FROM
+			sys_route_file t
+		WHERE
+			t.app_node =#{appNode}
+		AND t.eff_state = 1
+		]]>
+	</select>
+	<select id="selectMybatisFile" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+			SELECT
+				b.FILE_CODE,
+				b.FILE_CODE NAME_SPACE,
+				b.GROUP_NODE
+			FROM
+				sys_app_group a,
+				sys_mybatis_file b,
+				sys_group_info c
+			WHERE
+				a.group_node = b.group_node
+			AND a.group_node = c.group_node
+			AND c.group_type = '1'
+			AND b.eff_state = 1
+			AND a.app_node = #{appNode}
+		]]>
+	</select>
+	<select id="selectMybatisNodes" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+			SELECT
+				c.FILE_CODE,
+				c.NODE_CONTEXT
+			FROM
+				sys_mybatis_nodes c
+			WHERE
+				c.file_code IN (
+					SELECT
+						c.FILE_CODE
+					FROM
+						sys_app_group a,
+						sys_mybatis_file b,
+						sys_group_info c
+					WHERE
+						a.group_node = b.group_node
+					AND a.group_node = c.group_node
+					AND c.group_type = '1'
+					AND b.eff_state = 1
+					AND a.app_node = #{appNode}
+				)
+			AND c.eff_state = 1
+		]]>
+	</select>
+	<select id="selectBusServiceList" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+					SELECT
+						a.SERVICE_CODE,
+						a.IF_TRANSACTION
+					FROM
+						sys_service_bus a,
+						sys_app_group b,
+						sys_group_info c
+					WHERE
+						a.group_node = b.group_node
+					AND b.group_node = c.group_node
+					AND c.group_type = '2'
+					AND b.app_node = #{appNode}
+		]]>
+	</select>
+	<select id="selectAtomServiceList" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+					SELECT
+			            b.BUS_SERVICE_CODE,
+			            a.SERVICE_CODE,
+			            a.SERVICE_PATH,
+			            a.SERVICE_TYPE,
+			            a.ROUTE_TYPE,
+			            a.DATA_SOURCE
+					FROM
+						sys_service_atom a,
+						sys_service_rel b
+					WHERE
+						a.service_code = b.auom_service_code
+					AND b.bus_service_code IN (
+						SELECT
+							a.SERVICE_CODE
+						FROM
+							sys_service_bus a,
+							sys_app_group b,
+							sys_group_info c
+						WHERE
+							a.group_node = b.group_node
+						AND b.group_node = c.group_node
+						AND c.group_type = '2'
+						AND b.app_node = #{appNode}
+					)
+					ORDER BY
+					b.bus_service_code,
+					b.order_seq
+		]]>
+	</select>
+	<select id="selectServiceNodeList" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+				SELECT
+					A.SERVICE_ID,
+					B.GROUP_CODE,
+					A.IP_ADDRESS,
+					A.SERVICE_PORT,
+					A.SERVICE_CODE,
+					A.WEIGHT
+				FROM
+					SYS_SERVICE_NODE A
+				LEFT JOIN SYS_SERVICE_GROUP B ON A.GROUP_CODE = B.GROUP_CODE
+				WHERE
+					A.EFF_STATE = 1
+				AND A.IP_ADDRESS IS NOT NULL
+				AND A.SERVICE_PORT IS NOT NULL
+		]]>
+	</select>
+	<select id="selectServiceRouteList" parameterType="java.util.Map"
+		resultType="java.util.HashMap">
+     <![CDATA[		
+			SELECT A.ROUTE_ID,
+			       A.ROUTE_TYPE,
+			       A.ROUTE_EXPRESS,
+			       A.TARGET_TYPE,
+			       A.TARGET_CODE
+			  FROM sys_service_route a
+			 WHERE (a.app_node = #{appNode} OR a.app_node = 'comm_config')
+			   AND a.eff_state = 1
+			 ORDER BY a.priorty
+		]]>
+	</select>
+</mapper> 
